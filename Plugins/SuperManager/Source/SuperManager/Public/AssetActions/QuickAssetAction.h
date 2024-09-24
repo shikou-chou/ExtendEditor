@@ -52,5 +52,6 @@ private:
 		{UNiagaraSystem::StaticClass(), TEXT("NS_")},
 		{UNiagaraEmitter::StaticClass(), TEXT("NE_")}
 	};
-	
+
+	void FixUpRedirectors();
 };
