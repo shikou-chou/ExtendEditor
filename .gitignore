@@ -86,3 +86,4 @@ dist/
 
 # Sensitive config file
 /Content/CustomConfigs/CosConfig/CosConfig.json
+Content/StarterContent
