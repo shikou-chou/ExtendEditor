@@ -87,3 +87,7 @@ dist/
 # Sensitive config file
 /Content/CustomConfigs/CosConfig/CosConfig.json
 Content/StarterContent
+*ThirdPerson
+Content/Characters/Mannequin_UE4
+Content/Characters/Mannequins
+Content/LevelPrototyping
