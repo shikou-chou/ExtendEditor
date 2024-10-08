@@ -59,6 +59,14 @@ void FSuperManagerModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 		FSlateIcon(),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetButtonClicked)
 	);
+
+	MenuBuilder.AddMenuEntry
+	(
+		FText::FromString(TEXT("delete Empty Folders")),
+		FText::FromString(TEXT("Safely delete all empty folders")),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked)
+	);
 }
 
 void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
@@ -121,6 +129,50 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 	{
 		DebugHeader::ShowMessageDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder"), false);
 	}
+}
+
+void FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked()
+{
+	FixUpRedirectors();
+	
+	TArray<FString> FolderPathsArray = UEditorAssetLibrary::ListAssets(FolderPathsSelected[0], true, true);
+	uint32 Counter = 0;
+
+	FString EmptyFolderPathsNames;
+	TArray<FString> EmptyFoldersPathsArray;
+
+	for (const FString& FolderPath : FolderPathsArray)
+	{
+		// Don't touch root folder
+		if (FolderPath.Contains(TEXT("Developers")) ||
+			FolderPath.Contains(TEXT("Collections")) ||
+			FolderPath.Contains(TEXT("__ExternalActors__")) ||
+			FolderPath.Contains(TEXT("__ExternalObjects__")))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesDirectoryExist(FolderPath))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesDirectoryHaveAssets(FolderPath))
+		{
+			EmptyFolderPathsNames.Append(FolderPath);
+			EmptyFolderPathsNames.Append(TEXT("\n"));
+			
+			EmptyFoldersPathsArray.Add(FolderPath);
+		}
+	}
+
+	if (EmptyFoldersPathsArray.Num() == 0)
+	{
+		DebugHeader::ShowMessageDialog(EAppMsgType::Ok, TEXT("No empty folder found under selected folder"), false);
+		return;
+	}
+
+	DebugHeader::ShowMessageDialog(EAppMsgType::OkCancel, TEXT("Empty folders found in:\n") + EmptyFolderPathsNames, false);
 }
 
 void FSuperManagerModule::FixUpRedirectors()
